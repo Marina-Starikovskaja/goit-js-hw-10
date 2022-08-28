@@ -47,8 +47,8 @@ function renderMarkUp(listOfCountries) {
       .map(
         country =>
             `
-            <li>
-            <img src="${country.flags.svg}" alt="" width ="20">
+            <li class = "country-list-item">
+            <img class = "flag" src="${country.flags.svg}" alt="">
             <span>${country.name.official}</span>
             `
       )
@@ -63,7 +63,7 @@ function renderMarkUp(listOfCountries) {
         country =>
             `
             <li>
-            <img src="${country.flags.svg}" alt="" width ="20">
+            <img class="flag--small" src="${country.flags.svg}" alt="">
             <span> ${country.name.official}</span>
             <p>Capital: ${country.capital}</p>
             <p>Population: ${country.population}</p>

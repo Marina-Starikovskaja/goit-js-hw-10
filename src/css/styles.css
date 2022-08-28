@@ -17,4 +17,29 @@ body {
   padding: 8px;
   max-width: 320px;
   margin-bottom: 16px;
+  margin-left: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.country-list-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+
+
+
+.flag {
+  width: 50px;
+  height: 40px;
+  margin: auto 5px;
+}
+
+.flag--small {
+  width: 30px;
+  height: 20px;
 }
