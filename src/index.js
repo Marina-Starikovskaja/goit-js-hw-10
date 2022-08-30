@@ -1,78 +1,59 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
-import {findCountry} from './fetchCountries';
+import findCountry from './fetchCountries';
 
 const DEBOUNCE_DELAY = 300;
 
-const inputForm = document.getElementById(`search-box`);
-const listEl = document.querySelector(`.country-list`);
-inputForm.addEventListener(`input`, debounce(searchCountry, DEBOUNCE_DELAY));
+document.querySelector('#search-box').addEventListener('input', debounce(onInputListen, DEBOUNCE_DELAY));
+export const list = document.querySelector('.country-list');
+
 
 
 // Создаем функцию поиска страны
-function searchCountry(event) {
-  const country = event.target.value.trim();
+function onInputListen(evt) {
+  const inputValue = evt.target.value.trim();
+  if (!inputValue) {
+    list.innerHTML ='';
+    return;
+  };
 
-  if (!country || country === ``) {
-    listEl.innerHTML = ``;
-  }
-  findCountry(country)
-  .then(data => {
-    if(data.status === 404){
-    Notiflix.Notify.failure(`Oops, there is no country with that name`)
-  }
+  findCountry(inputValue).then(data => {
+    createMarkup(data)
+  })
+};
 
-  renderMarkUp(data);
-})
-.catch(error => {
-    Notiflix.Notify.failure(error)
-});
 
-}
-
-function renderMarkUp(listOfCountries) {
+function createMarkup(listOfCountries) {
     // Если в ответе бэкенд вернул больше чем 10 стран, 
     // в интерфейсе пояляется уведомление о том, что имя должно быть более специфичным. 
   if (listOfCountries.length > 10) {
-    Notiflix.Notify.warning('Too many matches found. Please enter a more specific name.');
-    return;
+    return Notiflix.Notify.warning('Too many matches found. Please enter a more specific name.');
+    // return;
   }
     // Если бэкенд вернул от 2-х до 10-х стран,
     // под тестовым полем отображается список найденных стран.
-  if (listOfCountries.length < 10 && listOfCountries.length >= 2) {
-    listEl.innerHTML = ``;
+  if (listOfCountries.length >2 && listOfCountries.length < 10) {
+  
     // Создание разметки
-    const fullListOfCountries = listOfCountries
-      .map(
-        country =>
-            `
-            <li class = "country-list-item">
-            <img class = "flag" src="${country.flags.svg}" alt="">
-            <span>${country.name.official}</span>
-            `
-      )
-      .join('');
-
-    listEl.insertAdjacentHTML(`afterbegin`, fullListOfCountries);
+    const markup = listOfCountries.map(({flags:{svg}, name:{official}}) => {
+        return `<li class="country-list-item">
+        <h2><img src="${svg}" alt="${official}" class = "flag"> ${official}</h2>
+        </li>` 
+      }).join('');
+    
+    list.innerHTML = markup;
   }
-  if (listOfCountries.length === 1) {
-    listEl.innerHTML = ``;
-    const newCountry = listOfCountries
-      .map(
-        country =>
-            `
-            <li>
-            <img class="flag--small" src="${country.flags.svg}" alt="">
-            <span> ${country.name.official}</span>
-            <p>Capital: ${country.capital}</p>
-            <p>Population: ${country.population}</p>
-            <p>Languages: ${Object.values(country.languages)}</p>
-            </li>
-            `
-      )
-      .join('');
-    // Добавление разметки в DOM
-    listEl.insertAdjacentHTML(`afterbegin`, newCountry);
+
+  if (listOfCountries.length === 1) {  
+    const markup = listOfCountries.map(({flags:{svg}, name:{official}, capital, population, languages}) => {
+        return `<li> 
+         <h2><img src="${svg}" alt="${official}" class = "flag--small"> ${official}</h2>
+         <p><b>Capital:</b> ${capital}</p>
+         <p><b>Population:</b> ${population}</p>
+         <p><b>Languages:</b> ${Object.values(languages)}</p>
+       </li>` 
+      }).join('');
+    list.innerHTML = markup;
   }
 }
